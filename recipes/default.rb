@@ -1,7 +1,7 @@
 require 'yaml'
 
 node[:deploy].each do |application, deploy|
-  rails_configs(deploy) do |filename, config|
+  (deploy['rails_config'] || []).each do |filename, config|
     file File.join(deploy['deploy_to'], 'shared', 'config', filename + '.yml') do
       content YAML.dump(deploy['rails_env'] => config).gsub(/!ruby\/.+$/, '')
       user deploy[:user]
@@ -9,5 +9,7 @@ node[:deploy].each do |application, deploy|
       mode 0770
       action :create
     end
+    # Write config to shared/config
+    # Link to APP/config
   end
 end
